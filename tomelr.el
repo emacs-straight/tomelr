@@ -3,8 +3,8 @@
 ;; Copyright (C) 2022 Free Software Foundation, Inc.
 
 ;; Author: Kaushal Modi <kaushal.modi@gmail.com>
-;; Version: 0.2.5
-;; Package-Requires: ((emacs "26.3"))
+;; Version: 0.3.0
+;; Package-Requires: ((emacs "26.3") (map "3.2.1") (seq "2.23"))
 ;; Keywords: data, tools, toml, serialization, config
 ;; URL: https://github.com/kaushalmodi/tomelr/
 
