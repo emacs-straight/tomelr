@@ -3,7 +3,7 @@
 ;; Copyright (C) 2022 Free Software Foundation, Inc.
 
 ;; Author: Kaushal Modi <kaushal.modi@gmail.com>
-;; Version: 0.3.0
+;; Version: 0.4.1
 ;; Package-Requires: ((emacs "26.3") (map "3.2.1") (seq "2.23"))
 ;; Keywords: data, tools, toml, serialization, config
 ;; URL: https://github.com/kaushalmodi/tomelr/
@@ -281,20 +281,17 @@ Return nil if OBJECT cannot be encoded as a TOML string."
     ;; (message "[tomelr--print-stringlike DBG] str = %S" str)
     (when (member key-type '(table-key table-array-key))
       ;; (message "[tomelr--print-stringlike DBG] %S is symbol, type = %S, depth = %d"
-      ;;          object type tomelr--print-indentation-depth)
+      ;;          object key-type tomelr--print-indentation-depth)
       (if (null (nth tomelr--print-indentation-depth tomelr--print-table-hierarchy))
-          (progn
-            (push str tomelr--print-table-hierarchy)
-            (setq tomelr--print-table-hierarchy (nreverse tomelr--print-table-hierarchy)))
+          (setq tomelr--print-table-hierarchy
+                (append tomelr--print-table-hierarchy (list str)))
+
         ;; Throw away table keys collected at higher depths, if
         ;; any, from earlier runs of this function.
         (setq tomelr--print-table-hierarchy
-              (seq-take tomelr--print-table-hierarchy
-                        (1+ tomelr--print-indentation-depth)))
-        (setf (nth tomelr--print-indentation-depth tomelr--print-table-hierarchy)
-              str))
-      ;; (message "[tomelr--print-stringlike DBG] table hier: %S"
-      ;;          tomelr--print-table-hierarchy)
+              (seq-take tomelr--print-table-hierarchy (1+ tomelr--print-indentation-depth)))
+        (setf (nth tomelr--print-indentation-depth tomelr--print-table-hierarchy) str))
+      ;; (message "[tomelr--print-stringlike DBG] table hier: %S" tomelr--print-table-hierarchy)
       )
     (cond
      ;; TT keys
@@ -428,8 +425,7 @@ Definition of a TOML Table Array (TTA):
   ;; Throw away table keys collected at higher depths, if
   ;; any, from earlier runs of this function.
   (setq tomelr--print-table-hierarchy
-        (seq-take tomelr--print-table-hierarchy
-                  (1+ tomelr--print-indentation-depth)))
+        (seq-take tomelr--print-table-hierarchy (1+ tomelr--print-indentation-depth)))
 
   (tomelr--print-indentation)
   (insert
@@ -480,6 +476,7 @@ See `tomelr-encode' that returns the same as a string."
   "Return a TOML representation of OBJECT as a string.
 If an error is detected during encoding, an error based on
 `tomelr-error' is signaled."
+  (setq tomelr--print-table-hierarchy ())
   (string-trim
    (tomelr--with-output-to-string (tomelr--print object))))
 
