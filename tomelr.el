@@ -3,7 +3,7 @@
 ;; Copyright (C) 2022 Free Software Foundation, Inc.
 
 ;; Author: Kaushal Modi <kaushal.modi@gmail.com>
-;; Version: 0.4.1
+;; Version: 0.4.3
 ;; Package-Requires: ((emacs "26.3") (map "3.2.1") (seq "2.23"))
 ;; Keywords: data, tools, toml, serialization, config
 ;; URL: https://github.com/kaushalmodi/tomelr/
@@ -209,10 +209,11 @@ Return the same STRING passed as input."
       (setq begin-q "\"\"\"\n")
       (setq end-q "\"\"\"")
       (when tomelr-indent-multi-line-strings
-        (let ((indentation (let ((tmp ""))
-                             (dotimes (_ (1+ tomelr--print-indentation-depth))
-                               (setq tmp (concat tmp tomelr-encoding-default-indentation)))
-                             tmp)))
+        (let (;; Fix the indentation of multi-line strings to 2
+              ;; spaces. If the indentation is increased to 4 or more
+              ;; spaces, those strings will get parsed as code blocks
+              ;; by Markdown parsers.
+              (indentation "  "))
           (setq string
                 (concat
                  indentation ;Indent the first line in the multi-line string
